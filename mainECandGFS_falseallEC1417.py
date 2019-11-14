@@ -12,7 +12,7 @@ import statsmodels.api as sm
 def FrameReadin():
     #福建石塘obs
     obs = ReadOBS_new(filename='./data/shitangObs_2019-UTC0.csv')
-    obswind = obs['spd70'].dropna(axis=0,how='any')[:1417]
+    obswind = obs['spd70'].dropna(axis=0,how='any')
     # convert type object to float64
     obswind = pd.to_numeric(obswind)
     # print(type(obswind))
@@ -38,7 +38,7 @@ def plotobs():
     # data = pd.DataFrame(df_plot, columns = list("ABCD"))
     data = df_plot
     
-    print(data)
+    # print(data)
     # plot
     # plt.plot(data)
     data.plot()
@@ -80,7 +80,7 @@ def SelectFeatures():
     #从下式中选择相关性
     #select features for our model
     corr = df_all.corr()[['spd70']].sort_values('spd70')
-    print(corr)
+    # print(corr)
     # # choose predictors end corr > 0.5
     #M1525
     # predictors = ['speed','windpower','windpower_1','speed_1','windpower_2','speed_2','windpower_3','speed_3',]
@@ -95,9 +95,9 @@ def SelectFeatures():
     df2.columns = ['spd70','EC1WindSpeed','EC2WindSpeed','EC3WindSpeed','EC3WindSpeed_1','EC3WindSpeed_2',
                     'EC4WindSpeed','EC4WindSpeed_1','EC5WindSpeed','EC6WindSpeed','EC7WindSpeed',
                     'EC7WindSpeed_1','EC7WindSpeed_2','EC8WindSpeed','EC8WindSpeed_1','EC8WindSpeed_2']
-    print(df2)
-    print(df2.info())
-    print(df2.columns)
+    # print(df2)
+    # print(df2.info())
+    # print(df2.columns)
     return predictors2, df2
 
 predictors, df2 = SelectFeatures()    
@@ -207,18 +207,18 @@ def plothot2():
     import seaborn as sns
     sns.set()
     corr = np.corrcoef(df2,rowvar=0)
-    print(corr.dtype)
-    print(np.size(corr))
-    print(np.size(corr,0))
-    print(np.size(corr,1))
-    print("hhhhhhhhhhhhhhh")
+    # print(corr.dtype)
+    # print(np.size(corr))
+    # print(np.size(corr,0))
+    # print(np.size(corr,1))
+    print("plot/hotfig2.png　ploted")
     for i in range(16):
         for j in range(16):
             if corr[i,j] < 0.9999:
                 corr[i,j] = corr[i,j] * 0.7
             else:
                 corr[i,j] = corr[i,j] 
-    print(corr)
+    # print(corr)
     fig, ax = plt.subplots(1, 1)
     # cbar_ax = fig.add_axes([.905, .3, .05, .3])
     cbar_ax = fig.add_axes([.93, .22, .025, .55])
@@ -236,16 +236,16 @@ plothot2()
 
 def BuildModel():
     #Using Step-wise Regression to Build a Robust Model
-    X = df2[predictors]
-    y = df2['spd70']
+    X = df2[predictors][:1417]
+    y = df2['spd70'][:1417]
 
     X = sm.add_constant(X)
-    #print(X.iloc[:5, :5])
+    # print(X.iloc[:5, :5])
 
     alpha = 0.05
     model = sm.OLS(y, X).fit()
 
-    print(model.summary())
+    # print(model.summary())
     return X,y
 X, y = BuildModel()
 X = X.drop('const', axis=1)
@@ -264,9 +264,7 @@ def train_split(test_size):
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=12)
     return X_train, X_test, y_train, y_test
-X_train, X_test, y_train, y_test = train_split(test_size=0.2)
-# print(X_test)
-# print(y_test)
+X_train, _X_test, y_train, _y_test = train_split(test_size=0.2)
 
 def train_regress():
     from sklearn.linear_model import LinearRegression
@@ -276,12 +274,25 @@ def train_regress():
     # fit the build the model by fitting the regressor to the training data
     regressor.fit(X_train, y_train)
 
+    # print("_X_test")
+    # print(_X_test)
+    predictors, df2 = SelectFeatures() 
+    # print("df2:")
+    # print(df2)
+    # print("predictors:")
+    # print(predictors)
+    X_test = df2[predictors][1417:]
+    # print("X_test")
+    # print(X_test)
+    y_test = df2['spd70'][1417:]
     # make a prediction set using the test set
     prediction = regressor.predict(X_test)
     # print(prediction)
-    # res=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index),only_fcst],axis=1).dropna()
-    res=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
-    # print(res)
+
+    result0=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
+    result=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
+    # print(result)
+    result.to_csv("./data/output_obs_prediction_3month.csv",float_format="%.2f")
 
     # Evaluate the prediction accuracy of the model
     from sklearn.metrics import mean_absolute_error, median_absolute_error
@@ -290,3 +301,5 @@ def train_regress():
     print("The Median Absolute Error: %.2f m/s " % median_absolute_error(y_test, prediction))
 
 train_regress()
+
+
