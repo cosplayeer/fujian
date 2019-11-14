@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from ReadOBS import ReadOBS_new
-from ReadSIM import ReadSIM_new,ReadSIMEC,ReadSIMGFS
+from ReadSIM import ReadSIMEC,ReadSIMGFS
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 
@@ -279,7 +279,7 @@ def train_regress():
 
     # make a prediction set using the test set
     prediction = regressor.predict(X_test)
-
+    print(prediction)
     # res=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index),only_fcst],axis=1).dropna()
     res=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
     print(res)
