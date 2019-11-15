@@ -288,10 +288,15 @@ def train_regress():
     # make a prediction set using the test set
     prediction = regressor.predict(X_test)
     # print(prediction)
+    prediction_origin_one = df2['EC1WindSpeed'][1417:]
+    # print(df2)
 
-    result0=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
+    #------------------
+    #y_test : 真实观测值,过后补全的; 
+    #prediction : 使用预报因子预报出来点结果
+    result0=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_one},index=y_test.index)],axis=1).dropna()
+    result0.to_csv("./data/output_obs_prediction_3month_origin_one.csv",float_format="%.2f")
     result=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
-    # print(result)
     result.to_csv("./data/output_obs_prediction_3month.csv",float_format="%.2f")
 
     # Evaluate the prediction accuracy of the model
