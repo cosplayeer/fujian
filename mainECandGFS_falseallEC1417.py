@@ -228,9 +228,9 @@ def plothot2():
     # cmap = sns.cubehelix_palette(start = 1.5, rot = 3, gamma=0.8, as_cmap = True)
     # sns.heatmap(uniform_data, ax=ax, cbar_ax = cbar_ax, square=True, linewidths = 0.05,vmax=1, cmap=cmap) # vmax=1, vmin=0,
     cmap="YlGnBu"
-    sns.heatmap(uniform_data, ax=ax, cbar_ax = cbar_ax, square=True, linewidths = 0.05,vmax=1, cmap=cmap,center = 0.7) # vmax=1, vmin=0,
+    sns.heatmap(uniform_data, ax=ax, cbar_ax = cbar_ax, square=True, linewidths = 0.05,vmax=1, cmap=cmap,center = 0.8) # vmax=1, vmin=0,
     
-    plt.savefig("plot/hotfig2.png")
+    plt.savefig("plot/hotfig3.png")
     plt.clf()
 plothot2()
 
@@ -245,7 +245,7 @@ def BuildModel():
     alpha = 0.05
     model = sm.OLS(y, X).fit()
 
-    # print(model.summary())
+    print(model.summary())
     return X,y
 X, y = BuildModel()
 X = X.drop('const', axis=1)
