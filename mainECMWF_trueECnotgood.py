@@ -7,29 +7,61 @@ from ReadOBS import ReadOBS_new
 from ReadSIM import ReadSIM_new, ReadSIM_ECMWF
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
-#福建石塘
-obs = ReadOBS_new(filename='./data/shitangObs_2019-UTC0.csv')
-obswind = obs['spd70'].dropna(axis=0,how='any')
-# convert type object to float64
-obswind = pd.to_numeric(obswind)
 
-simEC = ReadSIM_ECMWF(filename='./data/6HourlyshitangSim_ECMWF_UTC0.csv')
 
-obswinds = obswind.reindex(simEC.index).dropna()
-simulations = simEC.reindex(obswind.index).dropna()
+def FrameReadin():
+    #福建石塘
+    obs = ReadOBS_new(filename='./data/shitangObs_2019-UTC0.csv')
+    obswind = obs['spd70'].dropna(axis=0,how='any')
+    # convert type object to float64
+    obswind = pd.to_numeric(obswind)
 
-df_all = pd.concat([obswinds, simulations], axis = 1).dropna()
-# print(df_all)
-features_all = list(df_all)
-#print(df_all.info())
-spdObs = df_all['spd70'].dropna(axis = 0)
-print(spdObs)
+    simEC = ReadSIM_ECMWF(filename='./data/6HourlyshitangSim_ECMWF_UTC0.csv')
 
-# plot
-plt.plot(spdObs)
-plt.savefig("./data/hello.png")
-plt.clf()
+    obswinds = obswind.reindex(simEC.index).dropna()
+    simulations = simEC.reindex(obswind.index).dropna()
 
+    df_all = pd.concat([obswinds, simulations], axis = 1).dropna()
+    # # print(df_all)
+    # features_all = list(df_all)
+    # #print(df_all.info())
+    # spdObs = df_all['spd70'].dropna(axis = 0)
+    return df_all
+
+df_all = FrameReadin()
+
+def plotobs(df_all):
+    plotcols = ['spd70','WindSpeedVar11','WindSpeedVar24','WindSpeedVar8']
+    df_plot = df_all[plotcols]
+    print("DDDDDDDDDDDDDData")
+    print(df_plot)
+    df_plot.columns = ['spd70','WindSpeedVar11','WindSpeedVar24','WindSpeedVar8']
+    data = df_plot
+
+    # plot
+    data.plot()
+    #设置横纵坐标的名称以及对应字体格式
+    font2 = {'family' : 'Times New Roman',
+    'weight' : 'normal',
+    'size'   : 10,
+    }
+    plt.xlabel('time',font2)
+    plt.ylabel('wind speed (m/s) ',font2)
+    plt.legend(loc=1, prop={'size': 10})
+
+    plt.savefig("./plotorigin/data.png")
+    plt.clf()
+
+plotobs(df_all)
+
+def plotfigTimeSeriesThreetoOne(data):
+    plt = data.plot(lw=2,
+                    title="wind predict before and after MOS ")
+    plt.set_xlabel("time series")
+    plt.set_ylabel("wind speed (m/s) ")
+
+    fig = plt.get_figure()
+    fig.savefig("./plot/TimeSeriesThreetoOne.png")
 
 # time shift 纠正时间漂移-------------------
 def shitftime():
@@ -52,21 +84,15 @@ def shitftime():
 # shitftime()
 
 df_all = df_all.dropna(axis = 0)
-print(df_all)
-print(df_all.info())
-print(df_all.columns)
+# print(df_all)
+# print(df_all.info())
+# print(df_all.columns)
 #从下式中选择相关性
 #select features for our model
 corr = df_all.corr()[['spd70']].sort_values('spd70')
 print(corr)
 # # choose predictors end corr > 0.5
-predictors = ['WindSpeedVar1','WindSpeedVar2','WindSpeedVar3','WindSpeedVar4','WindSpeedVar5',
-            'WindSpeedVar6','WindSpeedVar7','WindSpeedVar8','WindSpeedVar9','WindSpeedVar10',
-            'WindSpeedVar11','WindSpeedVar12','WindSpeedVar13','WindSpeedVar14','WindSpeedVar15',
-            'WindSpeedVar16','WindSpeedVar17','WindSpeedVar18','WindSpeedVar19','WindSpeedVar20',
-            'WindSpeedVar21','WindSpeedVar22','WindSpeedVar23','WindSpeedVar24','WindSpeedVar25',
-            'WindSpeedVar26','WindSpeedVar27','WindSpeedVar28','WindSpeedVar29','WindSpeedVar30']
-            # 'WindSpeedVar31','WindSpeedVar32']
+predictors = ['WindSpeedVar11','WindSpeedVar24','WindSpeedVar23','WindSpeedVar8']
             # ,'WindSpeedVar33','WindSpeedVar34''WindSpeedVar35',
             # 'WindSpeedVar36','WindSpeedVar37','WindSpeedVar38','WindSpeedVar39''WindSpeedVar40',
             # 'WindSpeedVar41','WindSpeedVar42','WindSpeedVar43','WindSpeedVar44''WindSpeedVar45',
@@ -84,11 +110,11 @@ def corrfig():
 
     # call subplots specifying the grid structure we desire and that 
     # the y axes should be shared
-    fig, axes = plt.subplots(nrows=5, ncols=6, sharey=True)
+    fig, axes = plt.subplots(nrows=2, ncols=2, sharey=True)
 
     # Since it would be nice to loop through the features in to build this plot
     # let us rearrange our data into a 2D array of 6 rows and 3 columns
-    arr = np.array(predictors).reshape(5, 6)
+    arr = np.array(predictors).reshape(2, 2)
 
     # use enumerate to loop over the arr 2D array of rows and columns
     # and create scatter plots of each meantempm vs each feature
@@ -101,7 +127,7 @@ def corrfig():
             else:
                 axes[row, col].set(xlabel=feature)
     #plt.show()
-    plt.savefig("./data/corr.png")
+    plt.savefig("./plotorigin/corr.png")
     #-------------step 0 plot end----------------------#
 corrfig()
 
