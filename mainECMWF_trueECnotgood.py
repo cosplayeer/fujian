@@ -31,11 +31,11 @@ def FrameReadin():
 df_all = FrameReadin()
 
 def plotobs(df_all):
-    plotcols = ['spd70','WindSpeedVar11','WindSpeedVar24','WindSpeedVar8']
+    plotcols = ['spd70','WindSpeedVar24','WindSpeedVar29','WindSpeedVar23']
     df_plot = df_all[plotcols]
-    print("DDDDDDDDDDDDDData")
-    print(df_plot)
-    df_plot.columns = ['spd70','WindSpeedVar11','WindSpeedVar24','WindSpeedVar8']
+    # print("DDDDDDDDDDDDDData")
+    # print(df_plot)
+    df_plot.columns = ['spd70','WindSpeedVar24','WindSpeedVar29','WindSpeedVar23']
     data = df_plot
 
     # plot
@@ -49,19 +49,10 @@ def plotobs(df_all):
     plt.ylabel('wind speed (m/s) ',font2)
     plt.legend(loc=1, prop={'size': 10})
 
-    plt.savefig("./plotorigin/data.png")
+    plt.savefig("./plot/true/data.png")
     plt.clf()
 
 plotobs(df_all)
-
-def plotfigTimeSeriesThreetoOne(data):
-    plt = data.plot(lw=2,
-                    title="wind predict before and after MOS ")
-    plt.set_xlabel("time series")
-    plt.set_ylabel("wind speed (m/s) ")
-
-    fig = plt.get_figure()
-    fig.savefig("./plot/TimeSeriesThreetoOne.png")
 
 # time shift 纠正时间漂移-------------------
 def shitftime():
@@ -90,16 +81,12 @@ df_all = df_all.dropna(axis = 0)
 #从下式中选择相关性
 #select features for our model
 corr = df_all.corr()[['spd70']].sort_values('spd70')
-print(corr)
+# print(corr)
 # # choose predictors end corr > 0.5
 predictors = ['WindSpeedVar11','WindSpeedVar24','WindSpeedVar23','WindSpeedVar8']
-            # ,'WindSpeedVar33','WindSpeedVar34''WindSpeedVar35',
-            # 'WindSpeedVar36','WindSpeedVar37','WindSpeedVar38','WindSpeedVar39''WindSpeedVar40',
-            # 'WindSpeedVar41','WindSpeedVar42','WindSpeedVar43','WindSpeedVar44''WindSpeedVar45',
-            # 'WindSpeedVar46','WindSpeedVar47','WindSpeedVar48','WindSpeedVar49''WindSpeedVar50',
-            # 'WindSpeedVar51']
 
 df2 = df_all[['spd70'] + predictors]
+print("df22222222222222")
 print(df2)
 
 def corrfig():
@@ -127,7 +114,7 @@ def corrfig():
             else:
                 axes[row, col].set(xlabel=feature)
     #plt.show()
-    plt.savefig("./plotorigin/corr.png")
+    plt.savefig("./plot/true/corr.png")
     #-------------step 0 plot end----------------------#
 corrfig()
 
@@ -141,7 +128,7 @@ X = sm.add_constant(X)
 alpha = 0.05
 model = sm.OLS(y, X).fit()
 
-print(model.summary())
+# print(model.summary())
 
 # 选择 p > 0.05，说明独立性不好的，删掉。
 
@@ -151,8 +138,10 @@ from sklearn.model_selection import train_test_split
 #移除常数项，因为sk-lean库不像statsmodels，会自动给我们添加一项
 # first remove the const column because unlike statsmodels, SciKit-Learn will add that in for us
 X = X.drop('const', axis=1)
+print("XXXXXXXXXXX")
+print(X)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=12)
+X_train, _X_test, y_train, _y_test = train_test_split(X, y, test_size=0.2, random_state=12)
 
 from sklearn.linear_model import LinearRegression
 # instantiate the regressor class
@@ -161,12 +150,32 @@ regressor = LinearRegression()
 # fit the build the model by fitting the regressor to the training data
 regressor.fit(X_train, y_train)
 
+X_test = df2[predictors] 
+print(X_test) # no 1417 enough, all is 481
+
+y_test = df2['spd70']
+# make a prediction set using the test set
+# y_test = df2['spd70'][1417:]
 # make a prediction set using the test set
 prediction = regressor.predict(X_test)
 
+# ?? for what
 # res=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index),only_fcst],axis=1).dropna()
-res=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
-print(res)
+# res=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
+# print(res)
+
+# print(df2)
+prediction_origin_one = df2['WindSpeedVar11']
+
+#------------------
+#y_test : 真实观测值,过后补全的; 
+#prediction : 使用预报因子预报出来点结果
+# origin 原来的3月份预报
+result0=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_one},index=y_test.index)],axis=1).dropna()
+result0.to_csv("./data/true/output_obs_prediction_origin_one.csv",float_format="%.2f")
+# # no origin 订正后的3月份预报
+result=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
+result.to_csv("./data/true/output_obs_prediction.csv",float_format="%.2f")
 
 # Evaluate the prediction accuracy of the model
 from sklearn.metrics import mean_absolute_error, median_absolute_error

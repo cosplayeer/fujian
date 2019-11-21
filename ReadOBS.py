@@ -31,7 +31,7 @@ def ReadOBS_new(filename=None):
     #fhand = pd.read_csv('./data/testObs1.csv',index_col = 'time',usecols =[0,1,2])
     names = ['time', 'spd70']
     fhand = pd.read_csv(filename, skiprows = 1, 
-            names = names, usecols =[0,5])
+            names = names, usecols =[0,3])
     fhand = fhand.replace('NAN',np.nan)
     fhand = fhand.dropna()
     # fhand = pd.read_csv('./data_ec2017/M1525-Exported-timeleft.csv', skiprows = 2, 

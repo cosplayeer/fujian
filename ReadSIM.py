@@ -90,6 +90,7 @@ def ReadSIM_new(filename=None):
 
     return df
 
+# no use
 def ReadSIM_ECMWF(filename=None):
 #     namelists = ['TimeInfo', 'WindSpeedVar1', 'WindSpeedVar2', 'WindSpeedVar3', 'WindSpeedVar4', 'WindSpeedVar5', 'WindSpeedVar6', 'WindSpeedVar7', 'WindSpeedVar8','WindSpeedVar9','WindSpeedVar10',
 #                               'WindSpeedVar11', 'WindSpeedVar12', 'WindSpeedVar13', 'WindSpeedVar14', 'WindSpeedVar15', 'WindSpeedVar16', 'WindSpeedVar17', 'WindSpeedVar18','WindSpeedVar19','WindSpeedVar20',

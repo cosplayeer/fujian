@@ -56,7 +56,7 @@ def plotfigTimeSeriesThreetoOne(data):
     plt.set_ylabel("wind speed (m/s) ")
 
     fig = plt.get_figure()
-    fig.savefig("./plot/TimeSeriesThreetoOne.png")
+    fig.savefig("./plot/true/TimeSeriesThreetoOne.png")
     # plt.clf()
 
 def plotTimeGrouper(data):
@@ -127,9 +127,9 @@ def dataoutput(data):
         return data1h
     # output csv
     def pchip6h_output6h(data6h):
-        data6h.to_csv('./data/timeseries6hourly.csv', index = False, float_format="%.2f")
+        data6h.to_csv('./data/true/timeseries6hourly.csv', index = False, float_format="%.2f")
     def pchip6h_output1h(data1h):
-        data1h.to_csv('./data/timeseries1hourly.csv', index = False, float_format="%.2f")
+        data1h.to_csv('./data/true/timeseries1hourly.csv', index = False, float_format="%.2f")
    
     time_index, windpredict1h = pchip_prepare(data)
     data6h = pchip6h(time_index, windpredict1h)
