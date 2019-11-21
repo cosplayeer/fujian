@@ -71,8 +71,10 @@ def dataoutput(data):
     print("dataoutput running")
     print(data['before'].max())
     print(data['before'].min())
+    print(data['before'].mean())
     print(data['after'].max())
     print(data['after'].min())
+    print(data['after'].mean())
 
     def pchip_prepare(data):
         data['timeindex'] = data.index # add a new column into data
@@ -99,8 +101,10 @@ def dataoutput(data):
         framelist = [time_index_2, windpredict6h]
         data6h = pd.concat(framelist, axis = 1)
         #print(data6h.iloc[:,0])
-        print("data6h")
-        print(data6h)
+        print("data6h Max Min Avg")
+        print(data6h.max())
+        print(data6h.min())
+        print(data6h.mean())
         # data6h = data6h[data6h.windpredict6h > 0]
         return data6h
     
