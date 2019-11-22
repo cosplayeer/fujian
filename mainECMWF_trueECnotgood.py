@@ -165,14 +165,27 @@ prediction = regressor.predict(X_test)
 # print(res)
 
 # print(df2)
-prediction_origin_one = df2['WindSpeedVar11']
+prediction_origin_1 = df2['WindSpeedVar11']
+prediction_origin_2 = df2['WindSpeedVar24']
+prediction_origin_3 = df2['WindSpeedVar23']
+prediction_origin_4 = df2['WindSpeedVar8']
 
 #------------------
 #y_test : 真实观测值,过后补全的; 
 #prediction : 使用预报因子预报出来点结果
 # origin 原来的3月份预报
-result0=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_one},index=y_test.index)],axis=1).dropna()
-result0.to_csv("./data/true/output_obs_prediction_origin_one.csv",float_format="%.2f")
+#1
+result1=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_1},index=y_test.index)],axis=1).dropna()
+result1.to_csv("./data/true/output_obs_origin_1.csv",float_format="%.2f")
+#2
+result2=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_2},index=y_test.index)],axis=1).dropna()
+result2.to_csv("./data/true/output_obs_origin_2.csv",float_format="%.2f")
+#3
+result3=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_3},index=y_test.index)],axis=1).dropna()
+result3.to_csv("./data/true/output_obs_origin_3.csv",float_format="%.2f")
+#4
+result4=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_4},index=y_test.index)],axis=1).dropna()
+result4.to_csv("./data/true/output_obs_origin_4.csv",float_format="%.2f")
 # # no origin 订正后的3月份预报
 result=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
 result.to_csv("./data/true/output_obs_prediction.csv",float_format="%.2f")

@@ -30,8 +30,8 @@ def datapandas():
     #}
     #mainECMWF_trueECnotgood.py
     #{
-    inputfile1 = './data/true/output_obs_prediction_origin_one.csv'
-    inputfile2 = './data/true/output_obs_prediction.csv'
+    # inputfile1 = './data/true/output_obs_prediction_origin_one.csv'
+    # inputfile2 = './data/true/output_obs_prediction.csv'
     #}
      # origin 原来的3月份预报
     data1 = readindata(inputfile1,('time','spd70','before'))
@@ -40,7 +40,10 @@ def datapandas():
     # print(data1['time'].head())
     data1['time_parsed'] = pd.to_datetime(data1['time'],format="%Y-%m-%d %H:%M:%S")
     # print(data1['time_parsed'].head())
-    data1['before'] = data1['before'] - 1.2 # origin data as slow as true predictors
+    data1['before'] = data1['before'] - 2 # origin data as slow as true predictors
+    # print("data2222222222")
+    # print(data2)
+    data2['after'] = data2['after'] * 0.8 # origin data as slow as true predictors
     # todo : if spd < 0; set spd = 0;
     # print(type(data1))
     data_origin = pd.merge(data1,data2)
@@ -56,7 +59,7 @@ def plotfigTimeSeriesThreetoOne(data):
     plt.set_ylabel("wind speed (m/s) ")
 
     fig = plt.get_figure()
-    fig.savefig("./plot/true/TimeSeriesThreetoOne.png")
+    fig.savefig("./plot/TimeSeriesThreetoOne222.png")
     # plt.clf()
 
 def plotTimeGrouper(data):
@@ -71,10 +74,8 @@ def dataoutput(data):
     print("dataoutput running")
     print(data['before'].max())
     print(data['before'].min())
-    print(data['before'].mean())
     print(data['after'].max())
     print(data['after'].min())
-    print(data['after'].mean())
 
     def pchip_prepare(data):
         data['timeindex'] = data.index # add a new column into data
@@ -101,10 +102,8 @@ def dataoutput(data):
         framelist = [time_index_2, windpredict6h]
         data6h = pd.concat(framelist, axis = 1)
         #print(data6h.iloc[:,0])
-        print("data6h Max Min Avg")
-        print(data6h.max())
-        print(data6h.min())
-        print(data6h.mean())
+        print("data6h")
+        print(data6h)
         # data6h = data6h[data6h.windpredict6h > 0]
         return data6h
     
@@ -131,9 +130,9 @@ def dataoutput(data):
         return data1h
     # output csv
     def pchip6h_output6h(data6h):
-        data6h.to_csv('./data/true/timeseries6hourly.csv', index = False, float_format="%.2f")
+        data6h.to_csv('./data/timeseries6hourly.csv', index = False, float_format="%.2f")
     def pchip6h_output1h(data1h):
-        data1h.to_csv('./data/true/timeseries1hourly.csv', index = False, float_format="%.2f")
+        data1h.to_csv('./data/timeseries1hourly.csv', index = False, float_format="%.2f")
    
     time_index, windpredict1h = pchip_prepare(data)
     data6h = pchip6h(time_index, windpredict1h)
