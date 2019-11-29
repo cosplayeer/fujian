@@ -182,7 +182,91 @@ def ReadSIM_ECMWF(filename=None):
 
     return df
 
+def ReadSIM_ECMWF_F(filename=None):
+    namelists = ['TimeInfo', 'WindSpeedVar1', 'WindSpeedVar2', 'WindSpeedVar3', 'WindSpeedVar4', 'WindSpeedVar5', 'WindSpeedVar6', 'WindSpeedVar7', 'WindSpeedVar8','WindSpeedVar9','WindSpeedVar10',
+                                'WindSpeedVar11', 'WindSpeedVar12', 'WindSpeedVar13', 'WindSpeedVar14', 'WindSpeedVar15', 'WindSpeedVar16', 'WindSpeedVar17', 'WindSpeedVar18','WindSpeedVar19','WindSpeedVar20',
+                                'WindSpeedVar21', 'WindSpeedVar22', 'WindSpeedVar23', 'WindSpeedVar24', 'WindSpeedVar25', 'WindSpeedVar26', 'WindSpeedVar27', 'WindSpeedVar28','WindSpeedVar29','WindSpeedVar30',
+                                'WindSpeedVar31', 'WindSpeedVar32'] #, 'WindSpeedVar33', 'WindSpeedVar34']
+                                #, 'WindSpeedVar35']#, 'WindSpeedVar36', 'WindSpeedVar37', 'WindSpeedVar38','WindSpeedVar39','WindSpeedVar40']
+    fhand = pd.read_csv(filename, skiprows = 0, names = namelists, usecols =[0,1,2,3,4,5,6,7,8,9,10, 11,12,13,14,15,16,17,18,19,20,21,22,23,34,25,26,27,28,29,30,31,32]) 
+    #,35,36,37,38,39,40])
+    #     skiprows = 1, names = namelists, usecols =[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,34,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51])
+    print(fhand)
+#     return 0 
 
+    fhand = fhand.replace('NAN',np.nan)
+    fhand = fhand.dropna()
+    timeinfo = fhand['TimeInfo']
+
+    stringtime = timeinfo
+    timeinfo_panda = pd.to_datetime(stringtime,format='%Y%m%d%H')
+    WindSpeedVar1 = fhand['WindSpeedVar1']
+    WindSpeedVar2 = fhand['WindSpeedVar2']
+    WindSpeedVar3 = fhand['WindSpeedVar3']
+    WindSpeedVar4 = fhand['WindSpeedVar4']
+    WindSpeedVar5 = fhand['WindSpeedVar5']
+    WindSpeedVar6 = fhand['WindSpeedVar6']
+    WindSpeedVar7 = fhand['WindSpeedVar7']
+    WindSpeedVar8 = fhand['WindSpeedVar8']
+    WindSpeedVar9 = fhand['WindSpeedVar9']
+    WindSpeedVar10 = fhand['WindSpeedVar10']
+    WindSpeedVar11 = fhand['WindSpeedVar11']
+    WindSpeedVar12 = fhand['WindSpeedVar12']
+    WindSpeedVar13 = fhand['WindSpeedVar13']
+    WindSpeedVar14 = fhand['WindSpeedVar14']
+    WindSpeedVar15 = fhand['WindSpeedVar15']
+    WindSpeedVar16 = fhand['WindSpeedVar16']
+    WindSpeedVar17 = fhand['WindSpeedVar17']
+    WindSpeedVar18 = fhand['WindSpeedVar18']
+    WindSpeedVar19 = fhand['WindSpeedVar19']
+    WindSpeedVar20 = fhand['WindSpeedVar20']
+    WindSpeedVar21 = fhand['WindSpeedVar21']
+    WindSpeedVar22 = fhand['WindSpeedVar22']
+    WindSpeedVar23 = fhand['WindSpeedVar23']
+    WindSpeedVar24 = fhand['WindSpeedVar24']
+    WindSpeedVar25 = fhand['WindSpeedVar25']
+    WindSpeedVar26 = fhand['WindSpeedVar26']
+    WindSpeedVar27 = fhand['WindSpeedVar27']
+    WindSpeedVar28 = fhand['WindSpeedVar28']
+    WindSpeedVar29 = fhand['WindSpeedVar29']
+    WindSpeedVar30 = fhand['WindSpeedVar30']
+    WindSpeedVar31 = fhand['WindSpeedVar31']
+    WindSpeedVar32 = fhand['WindSpeedVar32']
+    # WindSpeedVar33 = fhand['WindSpeedVar33']
+    # WindSpeedVar34 = fhand['WindSpeedVar34']
+    # WindSpeedVar35 = fhand['WindSpeedVar35']
+    # WindSpeedVar36 = fhand['WindSpeedVar36']
+    # WindSpeedVar37 = fhand['WindSpeedVar37']
+    # WindSpeedVar38 = fhand['WindSpeedVar38']
+    # WindSpeedVar39 = fhand['WindSpeedVar39']
+    # WindSpeedVar40 = fhand['WindSpeedVar40']
+    # WindSpeedVar41 = fhand['WindSpeedVar41']
+    # WindSpeedVar42 = fhand['WindSpeedVar42']
+    # WindSpeedVar43 = fhand['WindSpeedVar43']
+    # WindSpeedVar44 = fhand['WindSpeedVar44']
+    # WindSpeedVar45 = fhand['WindSpeedVar45']
+    # WindSpeedVar46 = fhand['WindSpeedVar46']
+    # WindSpeedVar47 = fhand['WindSpeedVar47']
+    # WindSpeedVar48 = fhand['WindSpeedVar48']
+    # WindSpeedVar49 = fhand['WindSpeedVar49']
+    # WindSpeedVar50 = fhand['WindSpeedVar50']
+    # WindSpeedVar51 = fhand['WindSpeedVar51']
+    
+#     # Time Shift
+    features_all = [timeinfo_panda,
+            WindSpeedVar1,WindSpeedVar2,WindSpeedVar3,WindSpeedVar4,WindSpeedVar5,WindSpeedVar6,WindSpeedVar7,WindSpeedVar8, WindSpeedVar9, WindSpeedVar10,
+            WindSpeedVar11,WindSpeedVar12,WindSpeedVar13,WindSpeedVar14,WindSpeedVar15,WindSpeedVar16,WindSpeedVar17,WindSpeedVar18,WindSpeedVar19,WindSpeedVar20,
+            WindSpeedVar21,WindSpeedVar22,WindSpeedVar23,WindSpeedVar24,WindSpeedVar25,WindSpeedVar26,WindSpeedVar27,WindSpeedVar28,WindSpeedVar29,WindSpeedVar30,
+            WindSpeedVar31,WindSpeedVar32]
+            # ,WindSpeedVar33,WindSpeedVar34,WindSpeedVar35,WindSpeedVar36,WindSpeedVar37,WindSpeedVar38,WindSpeedVar39,WindSpeedVar40,
+            # WindSpeedVar41,WindSpeedVar42,WindSpeedVar43,WindSpeedVar44,WindSpeedVar45,WindSpeedVar46,WindSpeedVar47,WindSpeedVar48,WindSpeedVar49,WindSpeedVar50,
+            # WindSpeedVar51]
+            
+    result0 = pd.concat(features_all, axis = 1)
+    #print(result)
+    df = result0.set_index('TimeInfo')
+
+    return df
 #Test
 if __name__ == "__main__":
 #     df = ReadSIM_ECMWF(filename='./data/6HourlyshitangSim_ECMWF_UTC0.csv')
