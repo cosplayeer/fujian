@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -8,6 +9,21 @@ from ReadSIM import ReadSIM_new, ReadSIM_ECMWF,ReadSIM_ECMWF_F
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 
+""" to change:
+                line 56, line 113  """
+#20190101
+# DataInfo = "ECMWF20190101"
+# inputforecast="wind6houly201901-201903.csv"
+#20190201
+# DataInfo = "ECMWF20190201"
+# inputforecast="wind6houly201902-201904.csv"
+#20190301
+DataInfo = "ECMWF20190301"
+inputforecast="wind6houly201903-201905.csv"
+if not os.path.isdir("./data/" + DataInfo):
+    os.mkdir("./data/" + DataInfo)
+if not os.path.isdir("./plot/" + DataInfo):
+    os.mkdir("./plot/" + DataInfo)
 
 def FrameReadin():
     #福建石塘
@@ -16,7 +32,7 @@ def FrameReadin():
     # convert type object to float64
     obswind = pd.to_numeric(obswind)
 
-    simEC = ReadSIM_ECMWF_F(filename='./data_forecast_new/wind6houly201901-201903.csv')
+    simEC = ReadSIM_ECMWF_F(filename='./data_forecast_new/' + inputforecast)
 
     obswinds = obswind.reindex(simEC.index).dropna()
     simulations = simEC.reindex(obswind.index).dropna()
@@ -37,11 +53,15 @@ def FrameReadin():
 df_all = FrameReadin()
 
 def plotobs(df_all):
-    plotcols = ['spd70','WindSpeedVar1','WindSpeedVar28']
+    #20190201
+    # colms = ['spd70','WindSpeedVar9','WindSpeedVar25']
+    # 20190301
+    colms = ['WindSpeedVar3','WindSpeedVar29','WindSpeedVar13','WindSpeedVar11']
+    plotcols = colms
     df_plot = df_all[plotcols]
 
     # print(df_plot)
-    df_plot.columns = ['spd70','WindSpeedVar1','WindSpeedVar28']
+    df_plot.columns = colms
     data = df_plot
 
     # plot
@@ -55,7 +75,7 @@ def plotobs(df_all):
     plt.ylabel('wind speed (m/s) ',font2)
     plt.legend(loc=1, prop={'size': 10})
 
-    plt.savefig("./plot/ECMWF20190101/data.png")
+    plt.savefig("./plot/" + DataInfo + "/data.png")
     plt.clf()
 
 plotobs(df_all)
@@ -89,10 +109,14 @@ df_all = df_all.dropna(axis = 0)
 corr = df_all.corr()[['spd70']].sort_values('spd70')
 print(corr)
 # # choose predictors end corr > 0.5
-predictors = ['WindSpeedVar1','WindSpeedVar28','WindSpeedVar12','WindSpeedVar10']
-
+#{ECMWF20190101:}
+#predictors = ['WindSpeedVar1','WindSpeedVar28','WindSpeedVar12','WindSpeedVar10']
+#{ECMWF20190201:}
+#predictors = ['WindSpeedVar9','WindSpeedVar25','WindSpeedVar4','WindSpeedVar27']
+#{ECMWF20190301:}
+predictors = ['WindSpeedVar3','WindSpeedVar29','WindSpeedVar13','WindSpeedVar11']
+predictors2 = ['WindSpeedVar3','WindSpeedVar29']
 df2 = df_all[['spd70'] + predictors]
-print("df22222222222222")
 print(df2)
 
 def corrfig():
@@ -120,7 +144,7 @@ def corrfig():
             else:
                 axes[row, col].set(xlabel=feature)
     #plt.show()
-    plt.savefig("./plot/ECMWF20190101/corr.png")
+    plt.savefig("./plot/" + DataInfo + "/corr.png")
     #-------------step 0 plot end----------------------#
 corrfig()
 
@@ -144,7 +168,7 @@ from sklearn.model_selection import train_test_split
 #移除常数项，因为sk-lean库不像statsmodels，会自动给我们添加一项
 # first remove the const column because unlike statsmodels, SciKit-Learn will add that in for us
 X = X.drop('const', axis=1)
-print("XXXXXXXXXXX")
+print("training... ")
 print(X)
 
 X_train, _X_test, y_train, _y_test = train_test_split(X, y, test_size=0.2, random_state=12)
@@ -156,10 +180,17 @@ regressor = LinearRegression()
 # fit the build the model by fitting the regressor to the training data
 regressor.fit(X_train, y_train)
 
+#{
+# X_test = _X_test 
+# y_test = _y_test
+#}
+
+#{
 X_test = df2[predictors] 
 print(X_test) # no 1417 enough, all is 481
 
 y_test = df2['spd70']
+# }
 # make a prediction set using the test set
 # y_test = df2['spd70'][1417:]
 # make a prediction set using the test set
@@ -171,10 +202,10 @@ prediction = regressor.predict(X_test)
 # print(res)
 
 # print(df2)
-prediction_origin_1 = df2['WindSpeedVar10']
-prediction_origin_2 = df2['WindSpeedVar28']
-prediction_origin_3 = df2['WindSpeedVar1']
-prediction_origin_4 = df2['WindSpeedVar12']
+prediction_origin_1 = df2[predictors[0]]
+prediction_origin_2 = df2[predictors[1]]
+prediction_origin_3 = df2[predictors[2]]
+prediction_origin_4 = df2[predictors[3]]
 
 #------------------
 #y_test : 真实观测值,过后补全的; 
@@ -182,22 +213,37 @@ prediction_origin_4 = df2['WindSpeedVar12']
 # origin 原来的3月份预报
 #1
 result1=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_1},index=y_test.index)],axis=1).dropna()
-result1.to_csv("./data/ECMWF20190101/output_obs_origin_1.csv",float_format="%.2f")
+result1.to_csv("./data/" + DataInfo + "/output_obs_origin_1.csv",float_format="%.2f")
 #2
 result2=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_2},index=y_test.index)],axis=1).dropna()
-result2.to_csv("./data/ECMWF20190101/output_obs_origin_2.csv",float_format="%.2f")
+result2.to_csv("./data/" + DataInfo + "/output_obs_origin_2.csv",float_format="%.2f")
 #3
 result3=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_3},index=y_test.index)],axis=1).dropna()
-result3.to_csv("./data/ECMWF20190101/output_obs_origin_3.csv",float_format="%.2f")
+result3.to_csv("./data/" + DataInfo + "/output_obs_origin_3.csv",float_format="%.2f")
 #4
 result4=pd.concat([y_test,pd.DataFrame({'end_var':prediction_origin_4},index=y_test.index)],axis=1).dropna()
-result4.to_csv("./data/ECMWF20190101/output_obs_origin_4.csv",float_format="%.2f")
+result4.to_csv("./data/" + DataInfo + "/output_obs_origin_4.csv",float_format="%.2f")
 # # no origin 订正后的3月份预报
 result=pd.concat([y_test,pd.DataFrame({'end_var':prediction},index=y_test.index)],axis=1).dropna()
-result.to_csv("./data/ECMWF20190101/output_obs_prediction.csv",float_format="%.2f")
+result.to_csv("./data/" + DataInfo + "/output_obs_prediction.csv",float_format="%.2f")
 
 # Evaluate the prediction accuracy of the model
 from sklearn.metrics import mean_absolute_error, median_absolute_error
+# print("The Explained Variance: %.2f" % regressor.score(X_test, y_test))
+# print("The Mean Absolute Error: %.2f m/s " % mean_absolute_error(y_test, prediction))
+# print("The Median Absolute Error: %.2f m/s " % median_absolute_error(y_test, prediction))
+
+#signal
 print("The Explained Variance: %.2f" % regressor.score(X_test, y_test))
-print("The Mean Absolute Error: %.2f m/s " % mean_absolute_error(y_test, prediction))
-print("The Median Absolute Error: %.2f m/s " % median_absolute_error(y_test, prediction))
+print("The Mean Absolute Error: %.2f m/s " % mean_absolute_error(y_test, prediction_origin_1))
+print("The Median Absolute Error: %.2f m/s " % median_absolute_error(y_test, prediction_origin_1))
+
+print("prediction mean:")
+print(prediction.mean())
+print("prediction origin 1234 mean:")
+print(prediction_origin_1.mean())
+print(prediction_origin_2.mean())
+print(prediction_origin_3.mean())
+print(prediction_origin_4.mean())
+print("obs mean:")
+print(y_test.mean())
